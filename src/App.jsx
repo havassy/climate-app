@@ -108,6 +108,14 @@ const ClimateChartApp = () => {
     }
     
     currentMarker.current = window.L.marker([lat, lng]).addTo(leafletMap.current);
+    
+    // API kulcs újra ellenőrzése
+    console.log('🔍 handleMapClick - apiKey:', apiKey);
+    if (!apiKey || apiKey.trim() === '') {
+      alert('Kérem, adja meg a NOAA API kulcsot!');
+      return;
+    }
+    
     loadClimateData(lat, lng);
   };
 
