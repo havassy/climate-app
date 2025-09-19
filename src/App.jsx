@@ -112,10 +112,18 @@ const ClimateChartApp = () => {
   };
 
   const loadClimateData = async (lat, lng) => {
-    if (!apiKey) {
+    console.log('🔍 DEBUG - loadClimateData called');
+    console.log('🔑 apiKey értéke:', apiKey);
+    console.log('📝 apiKey típusa:', typeof apiKey);
+    console.log('📏 apiKey hossza:', apiKey ? apiKey.length : 'null/undefined');
+    
+    if (!apiKey || apiKey.trim() === '') {
+      console.log('❌ API kulcs hiányzik vagy üres!');
       alert('Kérem, adja meg a NOAA API kulcsot!');
       return;
     }
+    
+    console.log('✅ API kulcs rendben, folytatás...');
     
     setIsLoading(true);
     
