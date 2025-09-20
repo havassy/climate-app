@@ -205,14 +205,23 @@ loadClimateData(lat, lng);
       const dataUrl = `https://www.ncei.noaa.gov/cdo-web/api/v2/data?datasetid=GSOM&datatypeid=TAVG,TMIN,TMAX,PRCP&stationid=${nearestStation.id}&startdate=1991-01-01&enddate=2020-12-31&units=metric&limit=1000`;
       
       const dataResponse = await fetch(`${proxyEndpoint}?url=${encodeURIComponent(dataUrl)}&token=${apiKeyRef.current}`);
-      const climateResponse = await dataResponse.json();
-      
-      if (climateResponse.success && climateResponse.data) {
-        const processedData = processNOAAData(climateResponse.data, lat, lng, nearestStation.name);
-        setClimateData(processedData);
-      } else {
-        setClimateData(generateMockData(lat, lng));
-      }
+
+if (!dataResponse.ok) {
+  console.log('Data fetch failed, using mock data');
+  setClimateData(generateMockData(lat, lng));
+  setIsLoading(false);
+  return;
+}
+
+const climateResponse = await dataResponse.json();
+
+if (climateResponse.success && climateResponse.data) {
+  const processedData = processNOAAData(climateResponse.data, lat, lng, nearestStation.name);
+  setClimateData(processedData);
+} else {
+  console.log('No climate data, using mock data');
+  setClimateData(generateMockData(lat, lng));
+}
       
     } catch (error) {
       console.error('NOAA API hiba:', error);
