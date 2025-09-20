@@ -6,7 +6,6 @@ const ClimateChartApp = () => {
   const [climateData, setClimateData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [apiKey, setApiKey] = useState('');
-  const [showApiKeyInput, setShowApiKeyInput] = useState(true);
 
 // Debug: logoljuk az API kulcs változásait
 useEffect(() => {
@@ -151,18 +150,17 @@ loadClimateData(lat, lng);
   };
 
   const loadClimateData = async (lat, lng) => {
-    console.log('🔍 DEBUG - loadClimateData called');
-    console.log('🔑 apiKeyRef.current értéke:', apiKeyRef.current);
-    console.log('📝 apiKeyRef.current típusa:', typeof apiKeyRef.current);
-    console.log('📏 apiKeyRef.current hossza:', apiKeyRef.current ? apiKeyRef.current.length : 'null/undefined');
+    setIsLoading(true);
     
-    if (!apiKeyRef.current || apiKeyRef.current.trim() === '') {
-      console.log('❌ API kulcs hiányzik vagy üres!');
-      alert('Kérem, adja meg a NOAA API kulcsot!');
-      return;
-    }
+    // Egyszerűen mindig mock adatokat használunk
+    console.log('Intelligens mock adatok generálása koordinátákhoz:', lat, lng);
     
-    console.log('✅ API kulcs rendben, folytatás...');
+    // Kis várakozás a realisztikus élményért
+    setTimeout(() => {
+      setClimateData(generateMockData(lat, lng));
+      setIsLoading(false);
+    }, 1000);
+  };
     
     setIsLoading(true);
     
