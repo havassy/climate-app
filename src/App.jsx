@@ -173,7 +173,7 @@ loadClimateData(lat, lng);
       // Állomások keresése
       const stationsUrl = `https://www.ncei.noaa.gov/cdo-web/api/v2/stations?locationid=FIPS:HU&limit=50&offset=1`;
       
-      const stationsResponse = await fetch(`${proxyEndpoint}?url=${encodeURIComponent(stationsUrl)}&token=${apiKey}`);
+      const stationsResponse = await fetch(`${proxyEndpoint}?url=${encodeURIComponent(stationsUrl)}&token=${apiKeyRef.current}`);
       const stationsData = await stationsResponse.json();
       
       if (!stationsData.success || !stationsData.data) {
@@ -204,7 +204,7 @@ loadClimateData(lat, lng);
       // Klímaadatok lekérése
       const dataUrl = `https://www.ncei.noaa.gov/cdo-web/api/v2/data?datasetid=GSOM&datatypeid=TAVG,TMIN,TMAX,PRCP&stationid=${nearestStation.id}&startdate=1991-01-01&enddate=2020-12-31&units=metric&limit=1000`;
       
-      const dataResponse = await fetch(`${proxyEndpoint}?url=${encodeURIComponent(dataUrl)}&token=${apiKey}`);
+      const dataResponse = await fetch(`${proxyEndpoint}?url=${encodeURIComponent(dataUrl)}&token=${apiKeyRef.current}`);
       const climateResponse = await dataResponse.json();
       
       if (climateResponse.success && climateResponse.data) {
