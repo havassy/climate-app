@@ -6,7 +6,7 @@ const ClimateChartApp = () => {
   const [climateData, setClimateData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [apiKey, setApiKey] = useState('');
-const [showApiKeyInput, setShowApiKeyInput] = useState(true);
+  const [showApiKeyInput, setShowApiKeyInput] = useState(true);
 
 // Debug: logoljuk az API kulcs változásait
 useEffect(() => {
@@ -15,6 +15,7 @@ useEffect(() => {
   const mapRef = useRef(null);
   const leafletMap = useRef(null);
   const currentMarker = useRef(null);
+  const apiKeyRef = useRef('');
 
   // Proxy endpoint meghatározása
   const getProxyEndpoint = () => {
@@ -108,8 +109,13 @@ useEffect(() => {
         currentMarker.current = window.L.marker([lat, lng]).addTo(leafletMap.current);
         
         // API kulcs friss értékének használata
-        console.log('🔍 Térkép kattintás - aktuális apiKey hossza:', apiKey ? apiKey.length : 'nincs');
-        loadClimateData(lat, lng);
+        // API kulcs friss értékének használata useRef-ből
+console.log('🔍 Térkép kattintás - apiKeyRef.current:', apiKeyRef.current);
+if (!apiKeyRef.current || apiKeyRef.current.trim() === '') {
+  alert('Kérem, adja meg a NOAA API kulcsot!');
+  return;
+}
+loadClimateData(lat, lng, apiKeyRef.current);
       });
 
       const europeBounds = window.L.latLngBounds([34.0, -10.0], [71.0, 40.0]);
@@ -144,6 +150,7 @@ useEffect(() => {
   };
 
   const loadClimateData = async (lat, lng) => {
+    const actualApiKey = apiKeyParam || apiKeyRef.current;
     console.log('🔍 DEBUG - loadClimateData called');
     console.log('🔑 apiKey értéke:', apiKey);
     console.log('📝 apiKey típusa:', typeof apiKey);
@@ -356,7 +363,10 @@ useEffect(() => {
               <input
                 type="text"
                 value={apiKey}
-                onChange={(e) => setApiKey(e.target.value)}
+                onChange={(e) => {
+  setApiKey(e.target.value);
+  apiKeyRef.current = e.target.value; // ÚJ!
+}}
                 placeholder="Illessze be ide a NOAA API kulcsot..."
                 className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
               />
