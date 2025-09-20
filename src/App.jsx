@@ -6,7 +6,12 @@ const ClimateChartApp = () => {
   const [climateData, setClimateData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [apiKey, setApiKey] = useState('');
-  const [showApiKeyInput, setShowApiKeyInput] = useState(true);
+const [showApiKeyInput, setShowApiKeyInput] = useState(true);
+
+// Debug: logoljuk az API kulcs változásait
+useEffect(() => {
+  console.log('🔄 API kulcs state változott:', apiKey);
+}, [apiKey]);
   const mapRef = useRef(null);
   const leafletMap = useRef(null);
   const currentMarker = useRef(null);
@@ -337,12 +342,19 @@ const ClimateChartApp = () => {
                 className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
               />
               <button
-                onClick={() => setShowApiKeyInput(false)}
-                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none"
-                disabled={!apiKey.trim()}
-              >
-                Mentés
-              </button>
+  onClick={() => {
+    console.log('🔄 Mentés gomb - apiKey:', apiKey);
+    if (apiKey && apiKey.trim()) {
+      setShowApiKeyInput(false);
+    } else {
+      alert('Kérem, adjon meg egy érvényes API kulcsot!');
+    }
+  }}
+  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none"
+  disabled={!apiKey.trim()}
+>
+  Mentés
+</button>
             </div>
             <div className="mt-2">
               <button
