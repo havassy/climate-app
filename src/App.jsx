@@ -110,12 +110,13 @@ useEffect(() => {
         
         // API kulcs friss értékének használata
         // API kulcs friss értékének használata useRef-ből
+// API kulcs friss értékének használata useRef-ből
 console.log('🔍 Térkép kattintás - apiKeyRef.current:', apiKeyRef.current);
 if (!apiKeyRef.current || apiKeyRef.current.trim() === '') {
   alert('Kérem, adja meg a NOAA API kulcsot!');
   return;
 }
-loadClimateData(lat, lng, apiKeyRef.current);
+loadClimateData(lat, lng);
       });
 
       const europeBounds = window.L.latLngBounds([34.0, -10.0], [71.0, 40.0]);
@@ -150,13 +151,12 @@ loadClimateData(lat, lng, apiKeyRef.current);
   };
 
   const loadClimateData = async (lat, lng) => {
-    const actualApiKey = apiKeyParam || apiKeyRef.current;
     console.log('🔍 DEBUG - loadClimateData called');
-    console.log('🔑 apiKey értéke:', apiKey);
-    console.log('📝 apiKey típusa:', typeof apiKey);
-    console.log('📏 apiKey hossza:', apiKey ? apiKey.length : 'null/undefined');
+    console.log('🔑 apiKeyRef.current értéke:', apiKeyRef.current);
+    console.log('📝 apiKeyRef.current típusa:', typeof apiKeyRef.current);
+    console.log('📏 apiKeyRef.current hossza:', apiKeyRef.current ? apiKeyRef.current.length : 'null/undefined');
     
-    if (!apiKey || apiKey.trim() === '') {
+    if (!apiKeyRef.current || apiKeyRef.current.trim() === '') {
       console.log('❌ API kulcs hiányzik vagy üres!');
       alert('Kérem, adja meg a NOAA API kulcsot!');
       return;
