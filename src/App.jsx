@@ -91,7 +91,26 @@ useEffect(() => {
         maxZoom: 18
       }).addTo(leafletMap.current);
 
-      leafletMap.current.on('click', handleMapClick);
+      leafletMap.current.on('click', (e) => {
+        const { lat, lng } = e.latlng;
+        
+        if (lat < 34.0 || lat > 71.0 || lng < -10.0 || lng > 40.0) {
+          alert('Kérjük, válasszon egy helyszínt Európán belül!');
+          return;
+        }
+
+        setSelectedLocation({ lat: lat.toFixed(2), lng: lng.toFixed(2) });
+        
+        if (currentMarker.current) {
+          leafletMap.current.removeLayer(currentMarker.current);
+        }
+        
+        currentMarker.current = window.L.marker([lat, lng]).addTo(leafletMap.current);
+        
+        // API kulcs friss értékének használata
+        console.log('🔍 Térkép kattintás - aktuális apiKey hossza:', apiKey ? apiKey.length : 'nincs');
+        loadClimateData(lat, lng);
+      });
 
       const europeBounds = window.L.latLngBounds([34.0, -10.0], [71.0, 40.0]);
       leafletMap.current.setMaxBounds(europeBounds);
