@@ -41,16 +41,21 @@ exports.handler = async (event, context) => {
       throw new Error(`NOAA API hiba: ${response.status}`);
     }
 
-    const data = await response.text();
-    
-    return {
-      statusCode: 200,
-      headers,
-      body: JSON.stringify({ 
-        success: true, 
-        data: data 
-      })
-    };
+    let data;
+try {
+  data = await response.json(); // JSON-ként próbáljuk
+} catch (e) {
+  data = await response.text(); // Ha nem JSON, akkor text
+}
+
+return {
+  statusCode: 200,
+  headers,
+  body: JSON.stringify({ 
+    success: true, 
+    data: data 
+  })
+};
 
   } catch (error) {
     console.error('Proxy error:', error);
