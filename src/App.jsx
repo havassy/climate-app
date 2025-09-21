@@ -115,114 +115,35 @@ if (!apiKeyRef.current || apiKeyRef.current.trim() === '') {
   alert('Kérem, adja meg a NOAA API kulcsot!');
   return;
 }
-loadClimateData(lat, lng);
-      });
-
-      const europeBounds = window.L.latLngBounds([34.0, -10.0], [71.0, 40.0]);
-      leafletMap.current.setMaxBounds(europeBounds);
-    }
-  };
-
-  const handleMapClick = (e) => {
-    const { lat, lng } = e.latlng;
+const loadClimateData = async (lat, lng) => {
+    console.log('OpenWeatherMap adatok betöltése:', lat, lng);
     
-    if (lat < 34.0 || lat > 71.0 || lng < -10.0 || lng > 40.0) {
-      alert('Kérjük, válasszon egy helyszínt Európán belül!');
+    if (!apiKeyRef.current || apiKeyRef.current.trim() === '') {
+      alert('Kérem, adja meg az OpenWeatherMap API kulcsot!');
       return;
     }
-
-    setSelectedLocation({ lat: lat.toFixed(2), lng: lng.toFixed(2) });
-    
-    if (currentMarker.current) {
-      leafletMap.current.removeLayer(currentMarker.current);
-    }
-    
-    currentMarker.current = window.L.marker([lat, lng]).addTo(leafletMap.current);
-    
-    // API kulcs újra ellenőrzése
-    console.log('🔍 handleMapClick - apiKey:', apiKey);
-    if (!apiKey || apiKey.trim() === '') {
-      alert('Kérem, adja meg a NOAA API kulcsot!');
-      return;
-    }
-    
-    loadClimateData(lat, lng);
-  };
-
-  const loadClimateData = async (lat, lng) => {
-    setIsLoading(true);
-    
-    // Egyszerűen mindig mock adatokat használunk
-    console.log('Intelligens mock adatok generálása koordinátákhoz:', lat, lng);
-    
-    // Kis várakozás a realisztikus élményért
-    setTimeout(() => {
-      setClimateData(generateMockData(lat, lng));
-      setIsLoading(false);
-    }, 1000);
-  };
     
     setIsLoading(true);
     
     try {
-      // Proxy használata CORS probléma elkerülésére
-      const proxyEndpoint = getProxyEndpoint();
+      // OpenWeatherMap Current Weather API
+      const currentUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lng}&appid=${apiKeyRef.current}&units=metric`;
       
-      // Állomások keresése
-      const stationsUrl = `https://www.ncei.noaa.gov/cdo-web/api/v2/stations?locationid=FIPS:HU&limit=50&offset=1`;
+      const response = await fetch(currentUrl);
       
-      const stationsResponse = await fetch(`${proxyEndpoint}?url=${encodeURIComponent(stationsUrl)}&token=${apiKeyRef.current}`);
-      const stationsData = await stationsResponse.json();
-      
-      if (!stationsData.success || !stationsData.data) {
-        console.log('Nincs állomás találva, mock adatok használata');
-        setClimateData(generateMockData(lat, lng));
-        setIsLoading(false);
-        return;
+      if (!response.ok) {
+        throw new Error(`OpenWeatherMap API hiba: ${response.status}`);
       }
-
-      // JSON parsing if needed
-      let parsedData;
-      try {
-        parsedData = typeof stationsData.data === 'string' ? JSON.parse(stationsData.data) : stationsData.data;
-      } catch {
-        parsedData = stationsData.data;
-      }
-
-      if (!parsedData.results || parsedData.results.length === 0) {
-        console.log('Nincs állomás találva, mock adatok használata');
-        setClimateData(generateMockData(lat, lng));
-        setIsLoading(false);
-        return;
-      }
-
-      const nearestStation = parsedData.results[0];
-      console.log('Legközelebbi állomás:', nearestStation);
-
-      // Klímaadatok lekérése
-      const dataUrl = `https://www.ncei.noaa.gov/cdo-web/api/v2/data?datasetid=GSOM&datatypeid=TAVG&stationid=${nearestStation.id}&startdate=2023-01-01&enddate=2023-12-31&limit=12`;
       
-      const dataResponse = await fetch(`${proxyEndpoint}?url=${encodeURIComponent(dataUrl)}&token=${apiKeyRef.current}`);
-
-if (!dataResponse.ok) {
-  console.log('Data fetch failed, using mock data');
-  setClimateData(generateMockData(lat, lng));
-  setIsLoading(false);
-  return;
-}
-
-const climateResponse = await dataResponse.json();
-
-if (climateResponse.success && climateResponse.data) {
-  const processedData = processNOAAData(climateResponse.data, lat, lng, nearestStation.name);
-  setClimateData(processedData);
-} else {
-  console.log('No climate data, using mock data');
-  setClimateData(generateMockData(lat, lng));
-}
+      const data = await response.json();
+      console.log('OpenWeatherMap válasz:', data);
+      
+      // Klímaadat generálás a válasz alapján
+      const processedData = processOpenWeatherData(data, lat, lng);
+      setClimateData(processedData);
       
     } catch (error) {
-      console.error('NOAA API hiba:', error);
+      console.error('OpenWeatherMap API hiba:', error);
       setClimateData(generateMockData(lat, lng));
     }
     
